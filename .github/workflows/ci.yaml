@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Docker build
+        run: |
+          docker build -t metrics-dashboard:${{ github.sha }} .
+
+      - name: Push to local registry (if configured)
+        run: echo "Skipped for local dev"
+
+      - name: Helm Lint
+        run: helm lint charts/metrics-dashboard
